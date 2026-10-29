@@ -5,9 +5,9 @@
 #
 
 # Inherit from the proprietary version
-include vendor/xiaomi/miuicamera-pearl/vendor/BoardConfigVendor.mk
+include vendor/xiaomi/miuicamera-yuechu/vendor/BoardConfigVendor.mk
 
-MIUICAMERA_PATH := vendor/xiaomi/miuicamera-pearl
+MIUICAMERA_PATH := vendor/xiaomi/miuicamera-yuechu
 
 # Properties
 TARGET_SYSTEM_PROP += $(MIUICAMERA_PATH)/system.prop
