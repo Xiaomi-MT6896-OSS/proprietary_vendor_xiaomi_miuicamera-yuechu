@@ -15,16 +15,27 @@ modified without breaking its original signature.
      reported a busy state, so ACTION_DOWN events were dropped before the
      mode bar could handle them. It now always returns true.
 
+3. `com.android.camera.l3.n()` (GalleryHelper)
+   - The thumbnail review intent used `com.android.camera.action.REVIEW`
+     plus `setPackage("com.miui.gallery")`, which required the wrapper
+     activity.
+   - It now uses `android.intent.action.VIEW` with an explicit
+     `com.android.gallery3d/.app.GalleryActivity` component, so the camera
+     opens Gallery2's SinglePhotoPage directly.
+
 ## Effect
 
-After taking a photo, tapping a different mode switches immediately instead
-of being ignored for 10-30 seconds.
+- After taking a photo, tapping a different mode switches immediately instead
+  of being ignored for 10-30 seconds.
+- Tapping the camera thumbnail opens the last photo in Gallery2 directly,
+  without the extra `com.miui.gallery` wrapper hop.
 
 ## Verification
 
 - Photo -> portrait switch after a 12MP capture: works within 2 seconds.
 - Portrait capture still works.
 - Portrait -> photo switch after a capture: works.
+- Thumbnail -> Gallery2 SinglePhotoPage: opens the last image directly.
 
 ## Caveat
 
