@@ -20,8 +20,29 @@ typeattribute platform_app_36 hal_mtk_bgs_client;
 binder_call(platform_app, hal_mtk_bgs_server)
 binder_call(platform_app_36, hal_mtk_bgs_server)
 
-# The AIDL ISP HAL is a camera HAL service; join hal_camera_client so the
-# plat neverallow on hal_camera_service lets the camera look it up.
-hal_client_domain(platform_app, hal_camera)
-hal_client_domain(platform_app_36, hal_camera)
+# The AIDL ISP HAL is a camera HAL service.  platform_app has to join
+# hal_camera_client, otherwise the plat neverallow emitted by
+# hal_attribute_service(hal_camera, hal_camera_service) rejects the
+# service_manager lookup.
+#
+# This is the full-treble half of hal_client_domain(), spelled out by hand.
+# The macro must not be used here: when a non-full-treble policy is built
+# (which is exactly what sepolicy.recovery does) it additionally emits
+# `typeattribute $1 hal_camera`, pulling an appdomain into the hal_camera
+# attribute.  system/sepolicy/private/hal_camera.te then grants that whole
+# attribute access to video_device/camera_device, which collides with the
+# app.te neverallows (app.te:832 and app.te:839) and breaks `mka bacon`.
+#
+# The bare hal_camera membership only exists to run a HAL in passthrough
+# mode; this is a binderised vendor HAL, so the vendor policy never had it
+# either (full treble skips that branch) and runtime behaviour is unchanged.
+typeattribute platform_app halclientdomain;
+typeattribute platform_app hal_camera_client;
+allow platform_app hal_camera:memfd_file { read write getattr map };
+allow hal_camera platform_app:memfd_file { read write getattr map };
+
+typeattribute platform_app_36 halclientdomain;
+typeattribute platform_app_36 hal_camera_client;
+allow platform_app_36 hal_camera:memfd_file { read write getattr map };
+allow hal_camera platform_app_36:memfd_file { read write getattr map };
 allow platform_app_36 mtk_hal_bgs_hwservice:hwservice_manager find;
