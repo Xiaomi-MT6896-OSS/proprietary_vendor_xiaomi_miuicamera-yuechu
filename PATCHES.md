@@ -16,12 +16,14 @@ modified without breaking its original signature.
      mode bar could handle them. It now always returns true.
 
 3. `com.android.camera.l3.n()` (GalleryHelper)
-   - The thumbnail review intent used `com.android.camera.action.REVIEW`
-     plus `setPackage("com.miui.gallery")`, which required the wrapper
-     activity.
-   - It now uses `android.intent.action.VIEW` with an explicit
-     `com.android.gallery3d/.app.GalleryActivity` component, so the camera
-     opens Gallery2's SinglePhotoPage directly.
+   - The thumbnail review intent is now an explicit
+     `android.intent.action.VIEW` aimed at
+     `com.miui.gallery/.activity.HomePageActivity` (the device tree's
+     gallery stub) and carries `FLAG_GRANT_READ_URI_PERMISSION`, so the
+     viewer can read the photo even before it has been granted
+     READ_MEDIA_IMAGES.
+   - It no longer depends on Gallery2's non-exported `GalleryActivity`, so
+     no Gallery2 prebuilt is needed.
 
 4. `com.android.camera.b6.o.zg()` (ImageActionImpl)
    - The thumbnail click was still gated by `j7.n.g()`, which maps to
@@ -33,8 +35,8 @@ modified without breaking its original signature.
 
 - After taking a photo, tapping a different mode switches immediately instead
   of being ignored for 10-30 seconds.
-- Tapping the camera thumbnail opens the last photo in Gallery2 directly,
-  without the extra `com.miui.gallery` wrapper hop.
+- Tapping the camera thumbnail opens the last photo in the gallery stub
+  viewer (zoom / swipe); `编辑` there hands the photo to Gallery2.
 - The thumbnail still opens after a photo -> mode switch -> photo sequence,
   which previously hit the `DoingAction` guard.
 
